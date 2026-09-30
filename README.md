@@ -88,14 +88,19 @@ another client is picked up without a restart.
 
 ## Reaching a server over Tailscale
 
-Not required; any network path to the server works. If the server is only on
-your tailnet, Home Assistant has to be on it too, and on Home Assistant OS
-the Supervisor has to resolve the `*.ts.net` name. With the Tailscale app
-installed, point the Supervisor's DNS at the tailnet resolver once:
+If your karotto server is only reachable through a Tailscale network and you
+address it by its MagicDNS name, Home Assistant may fail to resolve that name
+even though the host itself is on the tailnet. On Home Assistant OS the
+integration's requests go through the Supervisor's DNS, which does not know
+about MagicDNS. Point it at the tailnet resolver once, from the Home Assistant
+terminal:
 
 ```sh
 ha dns options --servers dns://100.100.100.100
 ```
+
+Using the server's tailnet IP instead does not work around it: the TLS
+certificate is issued for the name, not the address.
 
 ## Development
 
