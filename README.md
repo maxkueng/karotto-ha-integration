@@ -97,6 +97,7 @@ terminal:
 
 ```sh
 ha dns options --servers dns://100.100.100.100
+ha dns restart
 ```
 
 Using the server's tailnet IP instead does not work around it: the TLS
