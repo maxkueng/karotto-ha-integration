@@ -9,7 +9,7 @@
           "password": "Password"
         },
         "data_description": {
-          "url": "Where the karotto web app is served, for example karotto.example.ts.net; https is assumed when no scheme is given"
+          "url": "Where the karotto web app is served, for example karotto.example.com; https is assumed when no scheme is given"
         }
       },
       "reauth_confirm": {

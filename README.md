@@ -53,14 +53,8 @@ token named "Home Assistant" and stores only the token; the password is
 discarded. Revoke the token from karotto's Settings → API Tokens to lock the
 integration out; it will then ask to sign in again.
 
-Home Assistant must be able to reach the server. Over Tailscale that means the
-Home Assistant host is on the tailnet and can resolve the `*.ts.net` name. On
-Home Assistant OS with the Tailscale app, point the Supervisor's DNS at the
-tailnet resolver once:
-
-```sh
-ha dns options --servers dns://100.100.100.100
-```
+Home Assistant must be able to reach the server's URL, the same one the web
+app uses. Plain `http://` works on a trusted network.
 
 ## Example: tick a daily from an automation
 
@@ -91,6 +85,17 @@ The integration opens the server's Server-Sent Events stream and applies task,
 order and user changes as they arrive. It also refetches everything every ten
 minutes and after every reconnect, so a dropped stream or a day rollover run by
 another client is picked up without a restart.
+
+## Reaching a server over Tailscale
+
+Not required; any network path to the server works. If the server is only on
+your tailnet, Home Assistant has to be on it too, and on Home Assistant OS
+the Supervisor has to resolve the `*.ts.net` name. With the Tailscale app
+installed, point the Supervisor's DNS at the tailnet resolver once:
+
+```sh
+ha dns options --servers dns://100.100.100.100
+```
 
 ## Development
 
