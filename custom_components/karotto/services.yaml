@@ -1,0 +1,63 @@
+score:
+  fields:
+    task:
+      required: true
+      example: shower
+      selector:
+        text:
+    direction:
+      default: up
+      selector:
+        select:
+          options:
+            - up
+            - down
+          translation_key: direction
+    rollover:
+      default: true
+      selector:
+        boolean:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: karotto
+
+run_rollover:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: karotto
+
+add_task:
+  fields:
+    type:
+      required: true
+      default: todo
+      selector:
+        select:
+          options:
+            - habit
+            - daily
+            - todo
+          translation_key: task_type
+    title:
+      required: true
+      example: Buy carrots
+      selector:
+        text:
+    notes:
+      selector:
+        text:
+          multiline: true
+    alias:
+      example: buy-carrots
+      selector:
+        text:
+    due_date:
+      selector:
+        date:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: karotto

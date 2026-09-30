@@ -1,0 +1,12 @@
+{
+  "domain": "karotto",
+  "name": "Karotto",
+  "codeowners": ["@maxkueng"],
+  "config_flow": true,
+  "documentation": "https://github.com/maxkueng/karotto-ha-integration",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/maxkueng/karotto-ha-integration/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

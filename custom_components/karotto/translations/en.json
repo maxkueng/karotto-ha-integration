@@ -1,0 +1,128 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Sign in to your karotto server. A long-lived API token named \"Home Assistant\" is created for this integration; your password is not stored.",
+        "data": {
+          "url": "Server URL",
+          "username": "Username",
+          "password": "Password"
+        },
+        "data_description": {
+          "url": "For example https://karotto.example.ts.net"
+        }
+      },
+      "reauth_confirm": {
+        "description": "The token for {username} on {url} was rejected. Enter the password to create a new one.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the server",
+      "invalid_auth": "Wrong username or password",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This karotto account is already configured",
+      "reauth_successful": "Token renewed",
+      "unique_id_mismatch": "The credentials belong to a different karotto account"
+    }
+  },
+  "entity": {
+    "todo": {
+      "todos": { "name": "To-dos" },
+      "dailies": { "name": "Dailies" }
+    },
+    "sensor": {
+      "dailies_remaining": { "name": "Dailies remaining" },
+      "dailies_completed": { "name": "Dailies completed" },
+      "todos_open": { "name": "Open to-dos" },
+      "todos_due": { "name": "To-dos due" },
+      "last_rollover": { "name": "Last rollover" }
+    },
+    "binary_sensor": {
+      "rollover_pending": { "name": "Rollover pending" }
+    }
+  },
+  "selector": {
+    "direction": {
+      "options": {
+        "up": "Up (complete / positive)",
+        "down": "Down (uncomplete / negative)"
+      }
+    },
+    "task_type": {
+      "options": {
+        "habit": "Habit",
+        "daily": "Daily",
+        "todo": "To-do"
+      }
+    }
+  },
+  "services": {
+    "score": {
+      "name": "Score task",
+      "description": "Completes a daily or to-do, uncompletes it, or counts a habit click. Returns the updated task.",
+      "fields": {
+        "task": {
+          "name": "Task",
+          "description": "Alias or ID of the task."
+        },
+        "direction": {
+          "name": "Direction",
+          "description": "Up completes or counts a positive click, down uncompletes or counts a negative click."
+        },
+        "rollover": {
+          "name": "Run rollover first",
+          "description": "Run the day rollover before scoring so the completion lands on the right day. Leave on for dailies."
+        },
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Only needed when several karotto accounts are configured."
+        }
+      }
+    },
+    "run_rollover": {
+      "name": "Run day rollover",
+      "description": "Runs the day rollover if one is pending. Missed dailies are decayed and today's dailies reset.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Only needed when several karotto accounts are configured."
+        }
+      }
+    },
+    "add_task": {
+      "name": "Add task",
+      "description": "Creates a habit, daily or to-do at the top of its list. Returns the new task.",
+      "fields": {
+        "type": {
+          "name": "Type",
+          "description": "Habit, daily or to-do."
+        },
+        "title": {
+          "name": "Title",
+          "description": "The task text."
+        },
+        "notes": {
+          "name": "Notes",
+          "description": "Optional notes."
+        },
+        "alias": {
+          "name": "Alias",
+          "description": "Optional short name for scripts, unique per account."
+        },
+        "due_date": {
+          "name": "Due date",
+          "description": "To-dos only."
+        },
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Only needed when several karotto accounts are configured."
+        }
+      }
+    }
+  }
+}
