@@ -32,18 +32,39 @@
   },
   "entity": {
     "todo": {
-      "todos": { "name": "To-dos" },
-      "dailies": { "name": "Dailies" }
+      "todos": {
+        "name": "To-dos"
+      },
+      "dailies": {
+        "name": "Dailies"
+      }
     },
     "sensor": {
-      "dailies_remaining": { "name": "Dailies remaining" },
-      "dailies_completed": { "name": "Dailies completed" },
-      "todos_open": { "name": "Open to-dos" },
-      "todos_due": { "name": "To-dos due" },
-      "last_rollover": { "name": "Last rollover" }
+      "dailies_remaining": {
+        "name": "Dailies remaining"
+      },
+      "dailies_completed": {
+        "name": "Dailies completed"
+      },
+      "todos_open": {
+        "name": "Open to-dos"
+      },
+      "todos_due": {
+        "name": "To-dos due"
+      },
+      "last_rollover": {
+        "name": "Last rollover"
+      }
     },
     "binary_sensor": {
-      "rollover_pending": { "name": "Rollover pending" }
+      "rollover_pending": {
+        "name": "Rollover pending"
+      }
+    },
+    "switch": {
+      "paused": {
+        "name": "Paused"
+      }
     }
   },
   "selector": {

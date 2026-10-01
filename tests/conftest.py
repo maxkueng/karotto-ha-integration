@@ -33,6 +33,7 @@ USER: dict[str, Any] = {
         "timezone": "Europe/Zurich",
         "dateFormat": "yyyy-MM-dd",
         "completedTodoRetentionDays": None,
+        "paused": False,
     },
 }
 

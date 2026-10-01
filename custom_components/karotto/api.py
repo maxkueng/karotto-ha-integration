@@ -121,6 +121,9 @@ class KarottoClient:
     async def get_user(self) -> dict[str, Any]:
         return await self._request("GET", "/user")
 
+    async def update_preferences(self, patch: dict[str, Any]) -> dict[str, Any]:
+        return await self._request("PATCH", "/user/preferences", body=patch)
+
     async def list_tasks(self, kind: str | None = None) -> list[dict[str, Any]]:
         params = {"type": kind} if kind else None
         return await self._request("GET", "/tasks", params=params)
