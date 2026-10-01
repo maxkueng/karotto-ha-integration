@@ -20,6 +20,7 @@ One device per karotto account with:
 | `sensor.<account>_to_dos_due` | Uncompleted to-dos due today or overdue, in the account's time zone. |
 | `sensor.<account>_last_rollover` | When the last day rollover ran. |
 | `binary_sensor.<account>_rollover_pending` | On when a rollover is due and no client has run it yet. |
+| `switch.<account>_paused` | Vacation mode. While on, days still roll over but missed dailies keep their streak and value and to-dos do not decay. Flip it from an automation when you leave and return. |
 
 Actions (services):
 
