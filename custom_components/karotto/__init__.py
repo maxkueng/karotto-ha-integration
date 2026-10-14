@@ -12,7 +12,7 @@ from .const import CONF_TOKEN, CONF_URL, DOMAIN
 from .coordinator import KarottoCoordinator
 from .services import async_setup_services
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR, Platform.TODO]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR, Platform.SWITCH, Platform.TODO]
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 

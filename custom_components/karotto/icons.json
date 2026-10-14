@@ -1,23 +1,56 @@
 {
   "entity": {
     "todo": {
-      "todos": { "default": "mdi:checkbox-marked-outline" },
-      "dailies": { "default": "mdi:calendar-check" }
+      "todos": {
+        "default": "mdi:checkbox-marked-outline"
+      },
+      "dailies": {
+        "default": "mdi:calendar-check"
+      }
     },
     "sensor": {
-      "dailies_remaining": { "default": "mdi:calendar-clock" },
-      "dailies_completed": { "default": "mdi:calendar-check" },
-      "todos_open": { "default": "mdi:format-list-checks" },
-      "todos_due": { "default": "mdi:calendar-alert" },
-      "last_rollover": { "default": "mdi:calendar-refresh" }
+      "dailies_remaining": {
+        "default": "mdi:calendar-clock"
+      },
+      "dailies_completed": {
+        "default": "mdi:calendar-check"
+      },
+      "todos_open": {
+        "default": "mdi:format-list-checks"
+      },
+      "todos_due": {
+        "default": "mdi:calendar-alert"
+      },
+      "last_rollover": {
+        "default": "mdi:calendar-refresh"
+      }
     },
     "binary_sensor": {
-      "rollover_pending": { "default": "mdi:calendar-refresh", "state": { "on": "mdi:calendar-alert" } }
+      "rollover_pending": {
+        "default": "mdi:calendar-refresh",
+        "state": {
+          "on": "mdi:calendar-alert"
+        }
+      }
+    },
+    "switch": {
+      "paused": {
+        "default": "mdi:play-circle-outline",
+        "state": {
+          "on": "mdi:pause-circle"
+        }
+      }
     }
   },
   "services": {
-    "score": { "service": "mdi:check-bold" },
-    "run_rollover": { "service": "mdi:calendar-refresh" },
-    "add_task": { "service": "mdi:playlist-plus" }
+    "score": {
+      "service": "mdi:check-bold"
+    },
+    "run_rollover": {
+      "service": "mdi:calendar-refresh"
+    },
+    "add_task": {
+      "service": "mdi:playlist-plus"
+    }
   }
 }
