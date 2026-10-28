@@ -16,7 +16,13 @@ from .api import (
     KarottoClient,
     KarottoConnectionError,
 )
-from .const import DOMAIN, POLL_INTERVAL, STREAM_RETRY_MAX, STREAM_RETRY_MIN
+from .const import (
+    DOMAIN,
+    EVENT_TASK_COMPLETED,
+    POLL_INTERVAL,
+    STREAM_RETRY_MAX,
+    STREAM_RETRY_MIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -59,6 +65,7 @@ class KarottoCoordinator(DataUpdateCoordinator[KarottoData]):
         self.client = client
         self.stream_connected = False
         self._stream_task: asyncio.Task[None] | None = None
+        self._completed: dict[str, bool] | None = None
 
     async def _async_update_data(self) -> KarottoData:
         try:
@@ -70,6 +77,32 @@ class KarottoCoordinator(DataUpdateCoordinator[KarottoData]):
         except (KarottoConnectionError, KarottoApiError) as error:
             raise UpdateFailed(str(error)) from error
         return KarottoData(user, {task["id"]: task for task in [*active, *completed]})
+
+    def async_update_listeners(self) -> None:
+        self._fire_completions()
+        super().async_update_listeners()
+
+    def _fire_completions(self) -> None:
+        if self.data is None:
+            return
+        completed = {
+            task_id: bool(task.get("completed")) for task_id, task in self.data.tasks.items()
+        }
+        if self._completed is not None:
+            for task_id, done in completed.items():
+                if done and self._completed.get(task_id) is False:
+                    task = self.data.tasks[task_id]
+                    self.hass.bus.async_fire(
+                        EVENT_TASK_COMPLETED,
+                        {
+                            "config_entry_id": self.config_entry.entry_id,
+                            "task_id": task_id,
+                            "type": task["type"],
+                            "title": task["text"],
+                            "alias": task.get("alias"),
+                        },
+                    )
+        self._completed = completed
 
     def start_stream(self) -> None:
         self._stream_task = self.config_entry.async_create_background_task(
