@@ -33,6 +33,12 @@ Actions (services):
 The native `todo.*` actions (`todo.add_item`, `todo.update_item`,
 `todo.remove_item`, `todo.get_items`) work on both lists.
 
+Events:
+
+| Event | What |
+|---|---|
+| `karotto_task_completed` | A daily or to-do went from open to completed, wherever it was checked off. Data: `config_entry_id`, `task_id`, `type`, `title`, `alias`. Completions that happened while Home Assistant was down do not fire. |
+
 ## Install
 
 ### HACS
@@ -72,6 +78,24 @@ actions:
 ```
 
 `shower` is the daily's alias, set in the task editor under Advanced Settings.
+
+## Example: react to a completed task
+
+```yaml
+triggers:
+  - trigger: event
+    event_type: karotto_task_completed
+    event_data:
+      alias: shower
+actions:
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.shower_reminder
+```
+
+Aliases are unique per account, completed to-dos included. A to-do an automation
+creates repeatedly needs a fresh alias each time, such as one stamped with the
+date, and the listener then matches on its prefix.
 
 ## Example: show today's dailies on a dashboard
 

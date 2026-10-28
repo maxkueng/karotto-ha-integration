@@ -18,6 +18,8 @@ SERVICE_SCORE: Final = "score"
 SERVICE_RUN_ROLLOVER: Final = "run_rollover"
 SERVICE_ADD_TASK: Final = "add_task"
 
+EVENT_TASK_COMPLETED: Final = "karotto_task_completed"
+
 ATTR_TASK: Final = "task"
 ATTR_DIRECTION: Final = "direction"
 ATTR_ROLLOVER: Final = "rollover"
