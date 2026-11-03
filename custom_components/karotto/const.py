@@ -17,6 +17,8 @@ STREAM_RETRY_MAX: Final = 120
 SERVICE_SCORE: Final = "score"
 SERVICE_RUN_ROLLOVER: Final = "run_rollover"
 SERVICE_ADD_TASK: Final = "add_task"
+SERVICE_FIND_TASKS: Final = "find_tasks"
+SERVICE_COMPLETE_TASKS: Final = "complete_tasks"
 
 EVENT_TASK_COMPLETED: Final = "karotto_task_completed"
 
@@ -29,3 +31,5 @@ ATTR_TITLE: Final = "title"
 ATTR_NOTES: Final = "notes"
 ATTR_ALIAS: Final = "alias"
 ATTR_DUE_DATE: Final = "due_date"
+ATTR_ALIAS_PREFIX: Final = "alias_prefix"
+ATTR_STATUS: Final = "status"

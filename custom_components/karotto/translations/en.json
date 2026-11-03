@@ -80,6 +80,12 @@
         "daily": "Daily",
         "todo": "To-do"
       }
+    },
+    "status": {
+      "options": {
+        "open": "Open",
+        "completed": "Completed"
+      }
     }
   },
   "services": {
@@ -138,6 +144,50 @@
         "due_date": {
           "name": "Due date",
           "description": "To-dos only."
+        },
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Only needed when several karotto accounts are configured."
+        }
+      }
+    },
+    "find_tasks": {
+      "name": "Find tasks",
+      "description": "Lists tasks matching all given filters, in list order. Returns them as tasks, each with id, type, title, alias, value, completed, streak and due_date.",
+      "fields": {
+        "type": {
+          "name": "Type",
+          "description": "Only habits, dailies or to-dos."
+        },
+        "status": {
+          "name": "Status",
+          "description": "Only open or only completed dailies and to-dos. Habits never match."
+        },
+        "alias": {
+          "name": "Alias",
+          "description": "Only the task with exactly this alias."
+        },
+        "alias_prefix": {
+          "name": "Alias prefix",
+          "description": "Only tasks whose alias starts with this text."
+        },
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Only needed when several karotto accounts are configured."
+        }
+      }
+    },
+    "complete_tasks": {
+      "name": "Complete to-dos",
+      "description": "Completes every open to-do matching the alias or alias prefix. Fires karotto_task_completed for each and returns the completed ones as tasks.",
+      "fields": {
+        "alias": {
+          "name": "Alias",
+          "description": "Complete the open to-do with exactly this alias."
+        },
+        "alias_prefix": {
+          "name": "Alias prefix",
+          "description": "Complete every open to-do whose alias starts with this text."
         },
         "config_entry_id": {
           "name": "Account",

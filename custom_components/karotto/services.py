@@ -16,16 +16,20 @@ from homeassistant.helpers import config_validation as cv
 from .api import KarottoApiError, KarottoConnectionError
 from .const import (
     ATTR_ALIAS,
+    ATTR_ALIAS_PREFIX,
     ATTR_CONFIG_ENTRY_ID,
     ATTR_DIRECTION,
     ATTR_DUE_DATE,
     ATTR_NOTES,
     ATTR_ROLLOVER,
+    ATTR_STATUS,
     ATTR_TASK,
     ATTR_TITLE,
     ATTR_TYPE,
     DOMAIN,
     SERVICE_ADD_TASK,
+    SERVICE_COMPLETE_TASKS,
+    SERVICE_FIND_TASKS,
     SERVICE_RUN_ROLLOVER,
     SERVICE_SCORE,
 )
@@ -53,6 +57,26 @@ ADD_TASK_SCHEMA = vol.Schema(
         vol.Optional(ATTR_DUE_DATE): cv.date,
         **ENTRY_FIELD,
     }
+)
+
+
+ALIAS_FIELDS = {
+    vol.Optional(ATTR_ALIAS): cv.string,
+    vol.Optional(ATTR_ALIAS_PREFIX): vol.All(cv.string, vol.Length(min=1)),
+}
+
+FIND_TASKS_SCHEMA = vol.Schema(
+    {
+        vol.Optional(ATTR_TYPE): vol.In(["habit", "daily", "todo"]),
+        vol.Optional(ATTR_STATUS): vol.In(["open", "completed"]),
+        **ALIAS_FIELDS,
+        **ENTRY_FIELD,
+    }
+)
+
+COMPLETE_TASKS_SCHEMA = vol.All(
+    vol.Schema({**ALIAS_FIELDS, **ENTRY_FIELD}),
+    cv.has_at_least_one_key(ATTR_ALIAS, ATTR_ALIAS_PREFIX),
 )
 
 
@@ -88,7 +112,17 @@ def task_summary(task: dict[str, Any]) -> dict[str, Any]:
         "value": task["value"],
         "completed": task.get("completed"),
         "streak": task.get("streak"),
+        "due_date": task.get("dueDate"),
     }
+
+
+async def complete(coordinator: KarottoCoordinator, task_id: str) -> dict[str, Any] | None:
+    try:
+        return await coordinator.async_score(task_id, "up", False)
+    except KarottoApiError as error:
+        if error.code == "already_completed":
+            return None
+        raise
 
 
 @callback
@@ -124,6 +158,31 @@ def async_setup_services(hass: HomeAssistant) -> None:
         coordinator.apply_task(created)
         return task_summary(created)
 
+    async def find_tasks(call: ServiceCall) -> ServiceResponse:
+        coordinator = coordinator_for(hass, call)
+        rows = coordinator.data.select(
+            call.data.get(ATTR_TYPE),
+            call.data.get(ATTR_STATUS),
+            call.data.get(ATTR_ALIAS),
+            call.data.get(ATTR_ALIAS_PREFIX),
+        )
+        return {"tasks": [task_summary(task) for task in rows]}
+
+    async def complete_tasks(call: ServiceCall) -> ServiceResponse:
+        coordinator = coordinator_for(hass, call)
+        rows = coordinator.data.select(
+            "todo",
+            "open",
+            call.data.get(ATTR_ALIAS),
+            call.data.get(ATTR_ALIAS_PREFIX),
+        )
+        completed = []
+        for task in rows:
+            result = await guarded(complete(coordinator, task["id"]))
+            if result:
+                completed.append(task_summary(result["task"]))
+        return {"tasks": completed}
+
     hass.services.async_register(
         DOMAIN, SERVICE_SCORE, score, SCORE_SCHEMA, SupportsResponse.OPTIONAL
     )
@@ -136,4 +195,14 @@ def async_setup_services(hass: HomeAssistant) -> None:
     )
     hass.services.async_register(
         DOMAIN, SERVICE_ADD_TASK, add_task, ADD_TASK_SCHEMA, SupportsResponse.OPTIONAL
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_FIND_TASKS, find_tasks, FIND_TASKS_SCHEMA, SupportsResponse.ONLY
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_COMPLETE_TASKS,
+        complete_tasks,
+        COMPLETE_TASKS_SCHEMA,
+        SupportsResponse.OPTIONAL,
     )
