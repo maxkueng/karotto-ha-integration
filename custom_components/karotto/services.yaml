@@ -61,3 +61,48 @@ add_task:
       selector:
         config_entry:
           integration: karotto
+
+find_tasks:
+  fields:
+    type:
+      selector:
+        select:
+          options:
+            - habit
+            - daily
+            - todo
+          translation_key: task_type
+    status:
+      selector:
+        select:
+          options:
+            - open
+            - completed
+          translation_key: status
+    alias:
+      example: buy-carrots
+      selector:
+        text:
+    alias_prefix:
+      example: dishwasher-
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: karotto
+
+complete_tasks:
+  fields:
+    alias:
+      example: buy-carrots
+      selector:
+        text:
+    alias_prefix:
+      example: dishwasher-
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: karotto

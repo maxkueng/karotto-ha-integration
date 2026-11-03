@@ -45,6 +45,28 @@ class KarottoData:
                 return task
         return None
 
+    def select(
+        self,
+        kind: str | None = None,
+        status: str | None = None,
+        alias: str | None = None,
+        alias_prefix: str | None = None,
+    ) -> list[dict[str, Any]]:
+        kinds = [kind] if kind else ["habit", "daily", "todo"]
+        rows = [task for each in kinds for task in self.of_type(each)]
+        if status:
+            done = status == "completed"
+            rows = [task for task in rows if task.get("completed") is done]
+        if alias is not None:
+            rows = [task for task in rows if task.get("alias") == alias]
+        if alias_prefix is not None:
+            rows = [
+                task
+                for task in rows
+                if task.get("alias") and task["alias"].startswith(alias_prefix)
+            ]
+        return rows
+
 
 class KarottoCoordinator(DataUpdateCoordinator[KarottoData]):
     config_entry: ConfigEntry

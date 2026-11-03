@@ -29,6 +29,8 @@ Actions (services):
 | `karotto.score` | Score a task by alias or ID. `direction` up completes a daily or to-do or counts a positive habit click, down does the reverse. `rollover` (default on) runs the day rollover first. Returns the updated task. |
 | `karotto.run_rollover` | Run the day rollover if one is pending. Returns `ran` and `days_missed`. |
 | `karotto.add_task` | Create a habit, daily or to-do. Returns the new task. |
+| `karotto.find_tasks` | List tasks matching every given filter: `type`, `status` (`open` or `completed`), exact `alias`, `alias_prefix`. Response only; returns `tasks`, each with `id`, `type`, `title`, `alias`, `value`, `completed`, `streak`, `due_date`. |
+| `karotto.complete_tasks` | Complete every open to-do whose alias equals `alias` or starts with `alias_prefix`. Each fires `karotto_task_completed`. Returns the completed ones as `tasks`; none matching is not an error. |
 
 The native `todo.*` actions (`todo.add_item`, `todo.update_item`,
 `todo.remove_item`, `todo.get_items`) work on both lists.
@@ -96,6 +98,45 @@ actions:
 Aliases are unique per account, completed to-dos included. A to-do an automation
 creates repeatedly needs a fresh alias each time, such as one stamped with the
 date, and the listener then matches on its prefix.
+
+## Example: find and complete to-dos by alias prefix
+
+An automation creates a fresh to-do each time the dishwasher finishes:
+
+```yaml
+actions:
+  - action: karotto.add_task
+    data:
+      type: todo
+      title: Empty the dishwasher
+      alias: "dishwasher-{{ now().strftime('%Y%m%d-%H%M') }}"
+```
+
+Another checks whether one is still open:
+
+```yaml
+actions:
+  - action: karotto.find_tasks
+    data:
+      type: todo
+      status: open
+      alias_prefix: dishwasher-
+    response_variable: found
+  - if: "{{ found.tasks | count > 0 }}"
+    then:
+      - action: notify.notify
+        data:
+          message: The dishwasher still needs emptying.
+```
+
+And a third ticks them all off:
+
+```yaml
+actions:
+  - action: karotto.complete_tasks
+    data:
+      alias_prefix: dishwasher-
+```
 
 ## Example: show today's dailies on a dashboard
 

@@ -51,6 +51,12 @@
     },
     "add_task": {
       "service": "mdi:playlist-plus"
+    },
+    "find_tasks": {
+      "service": "mdi:magnify"
+    },
+    "complete_tasks": {
+      "service": "mdi:checkbox-multiple-marked"
     }
   }
 }
