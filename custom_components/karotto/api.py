@@ -6,7 +6,7 @@ from typing import Any
 
 from aiohttp import ClientError, ClientResponse, ClientSession, ClientTimeout
 
-from .const import API_PREFIX, API_REVISION_HEADER, BASELINE_API_REVISION
+from .const import API_PREFIX, API_REVISION_HEADER, BASELINE_API_REVISION, CARD_FILE
 
 STREAM_TIMEOUT = ClientTimeout(total=None, connect=15, sock_read=90)
 REQUEST_TIMEOUT = ClientTimeout(total=30)
@@ -49,7 +49,8 @@ class KarottoClient:
         client_id: str | None = None,
     ) -> None:
         self._session = session
-        self._base = f"{normalize_url(url)}{API_PREFIX}"
+        self._root = normalize_url(url)
+        self._base = f"{self._root}{API_PREFIX}"
         self._token = token
         self._client_id = client_id
         self.server_revision: int | None = None
@@ -118,6 +119,50 @@ class KarottoClient:
         if response.status == 401:
             raise KarottoAuthError(message)
         raise KarottoApiError(response.status, code, message)
+
+    async def forward(
+        self,
+        method: str,
+        path: str,
+        body: Any | None,
+        client_id: str | None,
+    ) -> tuple[int, Any]:
+        """Send a request on someone else's behalf and hand back the answer, errors included."""
+        headers = self._headers()
+        if client_id:
+            headers["x-client-id"] = client_id
+        try:
+            async with self._session.request(
+                method,
+                f"{self._base}{path}",
+                headers=headers,
+                json=body,
+                timeout=REQUEST_TIMEOUT,
+            ) as response:
+                self._record_revision(response)
+                text = await response.text()
+                try:
+                    return response.status, json.loads(text) if text else None
+                except ValueError:
+                    return response.status, None
+        except ClientError as error:
+            raise KarottoConnectionError(str(error)) from error
+        except TimeoutError as error:
+            raise KarottoConnectionError("Request timed out") from error
+
+    async def fetch_card(self, etag: str | None) -> tuple[int, bytes, str | None]:
+        headers = {"if-none-match": etag} if etag else {}
+        try:
+            async with self._session.get(
+                f"{self._root}/{CARD_FILE}",
+                headers=headers,
+                timeout=REQUEST_TIMEOUT,
+            ) as response:
+                return response.status, await response.read(), response.headers.get("etag")
+        except ClientError as error:
+            raise KarottoConnectionError(str(error)) from error
+        except TimeoutError as error:
+            raise KarottoConnectionError("Request timed out") from error
 
     async def login(self, username: str, password: str, name: str) -> dict[str, Any]:
         created = await self._request(

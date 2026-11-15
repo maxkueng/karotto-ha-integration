@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -95,6 +96,8 @@ class KarottoCoordinator(DataUpdateCoordinator[KarottoData]):
         self.stream_connected = False
         self._stream_task: asyncio.Task[None] | None = None
         self._completed: dict[str, bool] | None = None
+        self._stream_listeners: set[Callable[[dict[str, Any]], None]] = set()
+        self._stream_seen = False
 
     async def _async_update_data(self) -> KarottoData:
         try:
@@ -184,10 +187,26 @@ class KarottoCoordinator(DataUpdateCoordinator[KarottoData]):
             if not first:
                 await self.async_request_refresh()
 
+    @callback
+    def async_add_stream_listener(
+        self, listener: Callable[[dict[str, Any]], None]
+    ) -> Callable[[], None]:
+        """Relay raw server events, and a resync after every reconnect, to listener."""
+        self._stream_listeners.add(listener)
+        return lambda: self._stream_listeners.discard(listener)
+
+    def _relay(self, message: dict[str, Any]) -> None:
+        for listener in list(self._stream_listeners):
+            listener(message)
+
     def _on_stream_connect(self) -> None:
         self.stream_connected = True
+        if self._stream_seen:
+            self._relay({"kind": "resync"})
+        self._stream_seen = True
 
     async def _handle_event(self, kind: str, payload: dict[str, Any]) -> None:
+        self._relay({"kind": "event", "type": kind, "event": payload})
         data = self.data
         if data is None:
             return
