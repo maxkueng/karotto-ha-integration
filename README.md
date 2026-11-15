@@ -152,6 +152,20 @@ order and user changes as they arrive. It also refetches everything every ten
 minutes and after every reconnect, so a dropped stream or a day rollover run by
 another client is picked up without a restart.
 
+## Server compatibility
+
+The integration and the karotto server release independently. They agree
+through the server's API revision, which it sends with every response. This
+integration needs at least revision `REQUIRED_API_REVISION` from
+`custom_components/karotto/const.py`; servers that predate the header count as
+revision 1.
+
+When the server is older, the integration keeps running and raises a warning
+under **Settings → Repairs**: features added since may fail or do nothing until
+the server is updated. The warning clears by itself once the server catches up.
+HACS always offers the newest integration release, so update the server before
+the integration when the warning appears.
+
 ## Reaching a server over Tailscale
 
 If your karotto server is only reachable through a Tailscale network and you
@@ -180,6 +194,14 @@ python -m venv .venv
 .venv/bin/pytest
 .venv/bin/ruff check custom_components tests
 ```
+
+When the integration starts using something a newer server adds, raise
+`REQUIRED_API_REVISION` to that server's revision, found in the karotto
+repository at `packages/core/src/api-revision.json`.
+
+Releases are GitHub releases tagged `v<version>`, matching `version` in
+`manifest.json`; HACS offers them as updates. Without a release HACS tracks
+commits on `master`.
 
 ## License
 
