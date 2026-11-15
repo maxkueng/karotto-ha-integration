@@ -8,6 +8,7 @@ from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import (
@@ -19,7 +20,9 @@ from .api import (
 from .const import (
     DOMAIN,
     EVENT_TASK_COMPLETED,
+    ISSUE_OUTDATED_SERVER,
     POLL_INTERVAL,
+    REQUIRED_API_REVISION,
     STREAM_RETRY_MAX,
     STREAM_RETRY_MIN,
 )
@@ -68,6 +71,10 @@ class KarottoData:
         return rows
 
 
+def outdated_server_issue_id(entry_id: str) -> str:
+    return f"{ISSUE_OUTDATED_SERVER}_{entry_id}"
+
+
 class KarottoCoordinator(DataUpdateCoordinator[KarottoData]):
     config_entry: ConfigEntry
 
@@ -98,7 +105,30 @@ class KarottoCoordinator(DataUpdateCoordinator[KarottoData]):
             raise ConfigEntryAuthFailed(str(error)) from error
         except (KarottoConnectionError, KarottoApiError) as error:
             raise UpdateFailed(str(error)) from error
+        self._report_server_revision()
         return KarottoData(user, {task["id"]: task for task in [*active, *completed]})
+
+    def _report_server_revision(self) -> None:
+        revision = self.client.server_revision
+        if revision is None:
+            return
+        issue_id = outdated_server_issue_id(self.config_entry.entry_id)
+        if revision >= REQUIRED_API_REVISION:
+            ir.async_delete_issue(self.hass, DOMAIN, issue_id)
+            return
+        ir.async_create_issue(
+            self.hass,
+            DOMAIN,
+            issue_id,
+            is_fixable=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key=ISSUE_OUTDATED_SERVER,
+            translation_placeholders={
+                "title": self.config_entry.title,
+                "server_revision": str(revision),
+                "required_revision": str(REQUIRED_API_REVISION),
+            },
+        )
 
     def async_update_listeners(self) -> None:
         self._fire_completions()

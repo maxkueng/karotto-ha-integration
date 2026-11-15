@@ -10,6 +10,9 @@ CONF_USERNAME: Final = "username"
 
 TOKEN_NAME: Final = "Home Assistant"
 API_PREFIX: Final = "/api/v1"
+API_REVISION_HEADER: Final = "x-karotto-api-revision"
+BASELINE_API_REVISION: Final = 1
+REQUIRED_API_REVISION: Final = 1
 POLL_INTERVAL: Final = timedelta(minutes=10)
 STREAM_RETRY_MIN: Final = 5
 STREAM_RETRY_MAX: Final = 120
@@ -21,6 +24,8 @@ SERVICE_FIND_TASKS: Final = "find_tasks"
 SERVICE_COMPLETE_TASKS: Final = "complete_tasks"
 
 EVENT_TASK_COMPLETED: Final = "karotto_task_completed"
+
+ISSUE_OUTDATED_SERVER: Final = "outdated_server"
 
 ATTR_TASK: Final = "task"
 ATTR_DIRECTION: Final = "direction"

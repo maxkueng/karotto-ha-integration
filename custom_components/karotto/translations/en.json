@@ -195,5 +195,11 @@
         }
       }
     }
+  },
+  "issues": {
+    "outdated_server": {
+      "title": "karotto server needs an update",
+      "description": "{title} serves API revision {server_revision}, but this version of the integration needs revision {required_revision}. Features added since then may fail or do nothing until the karotto server is updated; everything else keeps working. This goes away by itself once the server is updated."
+    }
   }
 }

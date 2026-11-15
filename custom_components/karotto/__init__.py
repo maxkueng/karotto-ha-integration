@@ -4,12 +4,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.typing import ConfigType
 
 from .api import KarottoClient
 from .const import CONF_TOKEN, CONF_URL, DOMAIN
-from .coordinator import KarottoCoordinator
+from .coordinator import KarottoCoordinator, outdated_server_issue_id
 from .services import async_setup_services
 
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR, Platform.SWITCH, Platform.TODO]
@@ -41,3 +42,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: KarottoConfigEntry) -> b
 
 async def async_unload_entry(hass: HomeAssistant, entry: KarottoConfigEntry) -> bool:
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: KarottoConfigEntry) -> None:
+    ir.async_delete_issue(hass, DOMAIN, outdated_server_issue_id(entry.entry_id))

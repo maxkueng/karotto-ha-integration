@@ -6,7 +6,7 @@ from typing import Any
 
 from aiohttp import ClientError, ClientResponse, ClientSession, ClientTimeout
 
-from .const import API_PREFIX
+from .const import API_PREFIX, API_REVISION_HEADER, BASELINE_API_REVISION
 
 STREAM_TIMEOUT = ClientTimeout(total=None, connect=15, sock_read=90)
 REQUEST_TIMEOUT = ClientTimeout(total=30)
@@ -52,6 +52,7 @@ class KarottoClient:
         self._base = f"{normalize_url(url)}{API_PREFIX}"
         self._token = token
         self._client_id = client_id
+        self.server_revision: int | None = None
 
     @property
     def token(self) -> str | None:
@@ -88,7 +89,16 @@ class KarottoClient:
         except TimeoutError as error:
             raise KarottoConnectionError("Request timed out") from error
 
+    def _record_revision(self, response: ClientResponse) -> None:
+        """A successful answer without the header comes from a karotto that predates it."""
+        header = response.headers.get(API_REVISION_HEADER, "")
+        if header.isdigit():
+            self.server_revision = int(header)
+        elif response.status < 400:
+            self.server_revision = BASELINE_API_REVISION
+
     async def _read(self, response: ClientResponse) -> Any:
+        self._record_revision(response)
         if response.status == 204:
             return None
         text = await response.text()
@@ -174,6 +184,7 @@ class KarottoClient:
     ) -> None:
         if response.status >= 400:
             await self._read(response)
+        self._record_revision(response)
         if on_connect:
             on_connect()
         event_type = ""
