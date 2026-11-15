@@ -81,8 +81,11 @@ COMPLETE_TASKS_SCHEMA = vol.All(
 
 
 def coordinator_for(hass: HomeAssistant, call: ServiceCall) -> KarottoCoordinator:
+    return coordinator_for_entry(hass, call.data.get(ATTR_CONFIG_ENTRY_ID))
+
+
+def coordinator_for_entry(hass: HomeAssistant, entry_id: str | None) -> KarottoCoordinator:
     entries = hass.config_entries.async_loaded_entries(DOMAIN)
-    entry_id = call.data.get(ATTR_CONFIG_ENTRY_ID)
     if entry_id:
         entries = [entry for entry in entries if entry.entry_id == entry_id]
     if not entries:

@@ -41,6 +41,9 @@ Events:
 |---|---|
 | `karotto_task_completed` | A daily or to-do went from open to completed, wherever it was checked off. Data: `config_entry_id`, `task_id`, `type`, `title`, `alias`. Completions that happened while Home Assistant was down do not fire. |
 
+A dashboard card shows karotto's own board; see
+[The karotto card](#the-karotto-card).
+
 ## Install
 
 ### HACS
@@ -144,6 +147,60 @@ actions:
 type: todo-list
 entity: todo.karotto_max_dailies
 ```
+
+## The karotto card
+
+`custom:karotto-card` puts karotto's own board on a dashboard: habits, dailies
+and to-dos side by side, with the value colours, streaks, counters and
+checklists of the web app. Check off dailies and to-dos, score habits, tick
+checklist items and start a new day from it. Creating, editing, deleting and
+reordering stay in the web and Android apps.
+
+```yaml
+type: custom:karotto-card
+```
+
+It is not a second frontend. The karotto server builds the card from the same
+code as its web app and serves it as `/karotto-card.js`; the integration
+fetches it from there and registers it with Home Assistant's frontend, so it
+is available as soon as the integration is set up and always matches your
+server. The browser never talks to karotto directly: the card's requests and
+live updates go over Home Assistant's own connection to the integration, which
+forwards them with its token. That is what makes it work in the companion app,
+on remote access and on wall tablets without signing in to karotto.
+
+Options:
+
+| Option | What |
+|---|---|
+| `theme` | A karotto theme: `carrot` (default), `classic`, `tokyo-night`, `synthwave`, `catppuccin`, `nord`, `gruvbox`, `solarized`. Light or dark follows Home Assistant. |
+| `config_entry_id` | Which account to show, needed only with several. Find it in the URL of the account's entry under **Settings → Devices & services → Karotto**. |
+
+The card fills the height it is given, with each column scrolling on its own.
+That suits a **panel** view, the usual choice for a wall tablet:
+
+```yaml
+views:
+  - title: Chores
+    type: panel
+    cards:
+      - type: custom:karotto-card
+```
+
+In a sections view it gets less height than its content and looks cramped.
+
+Only one karotto card works per view. A second one in the same view shows a
+notice instead of a board and takes over when the first goes away; put each
+account's card in a view of its own.
+
+Anyone who can open the dashboard can use the card. The integration only
+forwards what the board needs: reading the session, tasks, tags and rollover
+status, scoring tasks and checklist items, running the rollover, and folding
+checklists. Requests for anything else, such as tokens, account settings or
+editing tasks, are refused before they reach karotto.
+
+The card needs a karotto server that serves `/karotto-card.js`. With an older
+server it does not load, and the rest of the integration keeps working.
 
 ## How it stays current
 

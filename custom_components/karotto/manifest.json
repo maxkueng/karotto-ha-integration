@@ -1,14 +1,21 @@
 {
   "domain": "karotto",
   "name": "Karotto",
+  "after_dependencies": [
+    "frontend"
+  ],
   "codeowners": [
     "@maxkueng"
   ],
   "config_flow": true,
+  "dependencies": [
+    "http",
+    "websocket_api"
+  ],
   "documentation": "https://github.com/maxkueng/karotto-ha-integration",
   "integration_type": "service",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/maxkueng/karotto-ha-integration/issues",
   "requirements": [],
-  "version": "0.3.0"
+  "version": "0.4.0"
 }

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -9,9 +10,11 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.typing import ConfigType
 
 from .api import KarottoClient
-from .const import CONF_TOKEN, CONF_URL, DOMAIN
+from .const import CARD_URL, CONF_TOKEN, CONF_URL, DOMAIN
 from .coordinator import KarottoCoordinator, outdated_server_issue_id
 from .services import async_setup_services
+from .view import KarottoCardView
+from .websocket import async_setup_websocket
 
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR, Platform.SWITCH, Platform.TODO]
 
@@ -22,6 +25,10 @@ type KarottoConfigEntry = ConfigEntry[KarottoCoordinator]
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     async_setup_services(hass)
+    async_setup_websocket(hass)
+    hass.http.register_view(KarottoCardView())
+    if "frontend" in hass.config.components:
+        add_extra_js_url(hass, CARD_URL)
     return True
 
 

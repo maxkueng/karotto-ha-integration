@@ -10,6 +10,8 @@ CONF_USERNAME: Final = "username"
 
 TOKEN_NAME: Final = "Home Assistant"
 API_PREFIX: Final = "/api/v1"
+CARD_FILE: Final = "karotto-card.js"
+CARD_URL: Final = f"/{DOMAIN}/{CARD_FILE}"
 API_REVISION_HEADER: Final = "x-karotto-api-revision"
 BASELINE_API_REVISION: Final = 1
 REQUIRED_API_REVISION: Final = 1
