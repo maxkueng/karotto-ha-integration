@@ -174,7 +174,7 @@ Options:
 | Option | What |
 |---|---|
 | `theme` | A karotto theme: `carrot` (default), `classic`, `tokyo-night`, `synthwave`, `catppuccin`, `nord`, `gruvbox`, `solarized`. Light or dark follows Home Assistant. |
-| `config_entry_id` | Which account to show, needed only with several. One account per dashboard page. |
+| `config_entry_id` | Which account to show, needed only with several. Find it in the URL of the account's entry under **Settings → Devices & services → Karotto**. |
 
 The card fills the height it is given, with each column scrolling on its own.
 That suits a **panel** view, the usual choice for a wall tablet:
@@ -188,6 +188,10 @@ views:
 ```
 
 In a sections view it gets less height than its content and looks cramped.
+
+Only one karotto card works per view. A second one in the same view shows a
+notice instead of a board and takes over when the first goes away; put each
+account's card in a view of its own.
 
 Anyone who can open the dashboard can use the card. The integration only
 forwards what the board needs: reading the session, tasks, tags and rollover
